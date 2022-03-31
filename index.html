@@ -1,0 +1,583 @@
+<html><head><title>VISTAS - Exam Results</title>
+        <link type="text/css" href="style.css" rel="Stylesheet">
+        <style>
+            .blink {
+                animation: blink 1s steps(5, start) infinite;
+                background-color: #ffff66;
+            }
+            @keyframes blink {
+                to {
+                    visibility: hidden;
+                }
+            }
+
+        </style>
+        <script>
+
+            function hasClass(obj) {
+                var result = false;
+                if (obj.getAttributeNode("class") != null) {
+                    result = obj.getAttributeNode("class").value;
+                }
+                return result;
+            }
+
+            function stripeTables(id) {
+                var even = false;
+                var evenColor;
+                var oddColor;
+                var colorArray = new Array();
+                var cArrayCount = 0;
+                var colorArrayOdd = new Array();
+                var cArrayCountOdd = 0;
+                var IdArray = new Array();
+                var IdArrayCount = 0;
+
+                for (i_id = 0; i_id < arguments.length; i_id++) {
+
+                    if (i_id == 0) {
+                        IdArray[IdArrayCount] = arguments[i_id];
+                        IdArrayCount++;
+                    } else if (i_id == 1) {
+                        colorArray[cArrayCount] = arguments[i_id];
+                        cArrayCount++;
+                    } else if (i_id == 2) {
+                        colorArrayOdd[cArrayCountOdd] = arguments[i_id];
+                        cArrayCountOdd++
+                    }
+                }
+
+
+
+                for (a = 0; a < IdArray.length; a++) {
+                    evenColor = colorArray[a];
+                    oddColor = colorArrayOdd[a];
+
+                    var table = document.getElementById(IdArray[a]);
+                    if (!table) {
+                        return;
+                    }
+
+                    var tbodies = table.getElementsByTagName("tbody");
+
+                    for (var h = 0; h < tbodies.length; h++) {
+
+                        var trs = tbodies[h].getElementsByTagName("tr");
+
+                        for (var i = 0; i < trs.length; i++) {
+
+                            if (!hasClass(trs[i]) &&
+                                    !trs[i].style.backgroundColor) {
+
+                                var tds = trs[i].getElementsByTagName("td");
+
+                                for (var j = 0; j < tds.length; j++) {
+                                    var mytd = tds[j];
+
+                                    if (!hasClass(mytd) &&
+                                            !mytd.style.backgroundColor) {
+
+                                        mytd.className =
+                                                even ? evenColor : oddColor;
+                                    }
+                                }
+                            }
+                            even = !even;
+                        }
+                    }
+                } // for loop
+            }
+
+
+            function funAjaxmethod(arg) {
+                xmlHttp = GetXmlHttpObject();
+                if (xmlHttp == null) {
+                    alert("Browser does not support");
+                    return;
+                }
+
+                if (arg == 1) {
+                    trim('txtRegisterno');
+                    if (checkNumeric('txtRegisterno') == false)
+                        return false;
+
+                    if ((document.getElementById('txtRegisterno').value).length < 8) {
+                        alert('Please enter 8 digit register number!');
+                        return false;
+                    }
+                    registerno = document.getElementById('txtRegisterno').value;
+                    var url = "onlineResultInner.jsp";
+                    url = url + "?registerno=" + registerno + "&iden=1";
+                    divSelect = "divResult";
+                }
+                xmlHttp.onreadystatechange = stateChanged;
+                xmlHttp.open("GET", url, true);
+                xmlHttp.send(null);
+            }
+
+            function GetXmlHttpObject() {
+                var objXMLHttp = null;
+                if (window.XMLHttpRequest) {
+                    objXMLHttp = new XMLHttpRequest()
+                } else if (window.ActiveXObject) {
+                    objXMLHttp = new ActiveXObject("Microsoft.XMLHTTP")
+                }
+                return objXMLHttp
+            }
+
+            function stateChanged() {
+                if (xmlHttp.readyState == 4 || xmlHttp.readyState == "complete") {
+                    document.getElementById(divSelect).innerHTML = xmlHttp.responseText;
+                    stripeTables('table1', 'dynaColorTR1', 'dynaColorTR2');
+                    document.getElementById(divSelect).style.display = "block";
+                }
+            }//end of function stateChanged....
+
+            function checkNumeric(str, msg) {
+                var list = "0123456789.";
+                val = strTrim(document.getElementById(str).value);
+                for (var i = 0; i < val.length; i++) {
+                    if (list.indexOf(val.charAt(i)) == -1) {
+                        if (msg == null) {
+                            alert('Not a valid register number,\nNo character allowed!');
+                        }
+                        document.getElementById(str).focus();
+                        return false;
+                    }
+                }
+                return true;
+
+            }//checkNumeric
+
+            function submitenter(myfield, e)
+            {
+                var keycode;
+                if (window.event)
+                    keycode = window.event.keyCode;
+                else if (e)
+                    keycode = e.which;
+                else
+                    return true;
+
+                if (keycode == 13)
+                {
+                    funAjaxmethod(1);
+                    return false;
+                } else
+                    return true;
+            }
+
+            function checkNumeric(str, msg) {
+                var list = "0123456789.";
+                val = strTrim(document.getElementById(str).value);
+                for (var i = 0; i < val.length; i++) {
+                    if (list.indexOf(val.charAt(i)) == -1) {
+                        if (msg == null) {
+                            alert('Not A Valid Data!');
+                        } else {
+                            alert('Not a Valid Data in ' + msg + '!');
+                        }
+                        document.getElementById(str).value = "";
+                        document.getElementById(str).focus();
+                        return false;
+                    }
+                }
+                return true;
+
+            }//checkNumeric
+
+            function strTrim(str) {
+                var str1 = strLTrim(str);
+                var str2 = strRTrim(str1);
+                return str2;
+            }
+
+            function strLTrim(str) {
+                var len = str.length;
+                var temp = '';
+                for (i = 0; i < len; i++) {
+                    var chr = str.charAt(i);
+                    if (chr != ' ') {
+                        temp = temp + str.substring(i);
+                        i = len;
+                    }
+                }
+                return temp;
+            }
+
+            function strRTrim(str) {
+                var len = str.length;
+                var temp = '';
+                for (i = len - 1; i >= 0; i--) {
+                    chr = str.charAt(i);
+                    if (chr != ' ') {
+                        temp = temp + str.substring(0, i + 1);
+                        i = -1;
+                    }
+                }
+                return temp;
+            }
+
+            function trim(str) {
+                lTrim(str);
+                rTrim(str);
+            }
+
+
+            function lTrim(str) {
+                var val = document.getElementById(str).value;
+                var len = val.length;
+                var temp = '';
+                for (i = 0; i < len; i++) {
+                    var chr = val.charAt(i);
+                    if (chr != ' ') {
+                        temp = temp + val.substring(i);
+                        i = len;
+                    }
+                }
+                document.getElementById(str).value = temp;
+                return true;
+            }
+
+            function rTrim(str) {
+                var val = document.getElementById(str).value;
+                var len = val.length;
+                var temp = '';
+                for (i = len - 1; i >= 0; i--) {
+                    chr = val.charAt(i);
+                    if (chr != ' ') {
+                        temp = temp + val.substring(0, i + 1);
+                        i = -1;
+                    }
+                }
+                document.getElementById(str).value = temp;
+            }
+
+
+        </script>
+        <style>
+            .hide {
+                display:none;
+            }
+
+            .dynaColorTR1{
+                BACKGROUND-COLOR: #E6F0F5;
+            }
+            .dynaColorTR2{
+                BACKGROUND-COLOR: #CCE0EB;
+            }
+            input.submitButton{
+                background-color:#0059b3;
+                color:#ffffff;
+                -moz-border-radius: 5px;
+                width: 90px;
+                /*background-image:"../../resources/Image/submit1.gif";*/
+            }
+
+            input.submitButton:hover{
+                cursor:pointer ;
+                color:yellow;
+                width: 90px;
+                -moz-border-radius: 5px;
+            }
+            table.resultTable {
+                -moz-border-radius: 10px;
+                width:100%;
+                background-color:#0059b3;
+            }
+        </style>
+    </head>
+    <body>
+        <form id="frmOnlineResult" name="frmOnlineResult" action="" method="post" autocomplete="off">
+            <table name="Title table" width="80%" align="center" border="0" cellpadding="3" cellspacing="3">
+                <tbody><tr>
+                    <td align="center">
+                        <div>
+                            <img width="80px" align="left" height="80px" src="alam.jpeg"><font color="#0059b3" size="5"><b><u>VELS INSTITUTE OF SCIENCE, TECHNOLOGY AND ADVANCED STUDIES (VISTAS)</u></b> </font>
+                            <br><font color="#0059b3" size="3"><b>CHENNAI, INDIA.</b> </font>
+                            <br><font color="#0059b3" size="2"> Estd. u/s 3 of the UGC Act, 1956 </font>
+                        </div>
+                    </td>
+                </tr>
+                <!--                <TR>
+                                    <TD align="center">
+                                    <font color="#396A92" size="2"> Estd. u/s 3 of the UGC Act, 1956 </font></TD>
+                                </TR>-->
+                <tr>
+                    <td align="center"><font size="4"><b>UNIVERSITY EXAMINATION RESULTS -  NOV 2021</b></font></td>
+                </tr>
+            </tbody></table>
+            <hr>
+            <table class="resultTable" name="Main table" align="center" border="0" cellpadding="3" cellspacing="3">
+                <tbody><tr><td>
+                        <table align="center" width="100%">
+                            <tbody><tr align="center" style="height:40px">
+                                <td width="60%" nowrap="" align="center">
+                                    <font color="#FDFDFD"><b>Enter Register Number</b></font>&nbsp;
+                                    <input id="txtRegisterno" name="txtRegisterno" maxlength="8" size="12" class="listboxtext" onkeypress="return submitenter(this, event)">
+                                    <input type="button" value="SUBMIT" alt="Click Me" class="submitButton" onclick="javascript:funAjaxmethod(1)">
+                                </td>
+                            </tr>
+                            <tr align="center">
+                                <td></td>
+                            </tr>
+                        </tbody></table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div id="divResult" name="divResult" width="100%" style="display: block;">
+
+
+
+
+
+
+
+
+
+<div style="position:absolute;left:10px;top:100px">
+    <table bgcolor="#091D42" align="CENTER" cellpadding="3"><tbody><tr class="dynaColorTR1"><td colspan="2" style="FONT-SIZE: 15px;" align="CENTER"><font color="#091D42"> Results Viewed :&nbsp;2331067</font></td></tr></tbody></table>
+</div>
+<table width="100%" class="dynaColorTR2" align="center" cellpadding="5" cellspacing="1" style="background-color:#C8D3EC">
+    <tbody><tr><td class="dynaColorTR1" width="5%" nowrap="">Name</td>
+        <td class="dynaColorTR1" style="FONT-SIZE: 15px;">SAINAM SUNAIDHA A  [ 31-05-2001 ]</td>
+    </tr>
+    <tr><td class="dynaColorTR1" nowrap="">Register No.&nbsp;&nbsp;&nbsp;</td>
+        <td class="dynaColorTR1" style="FONT-SIZE: 15px;">20151150</td>
+    </tr>
+    <tr><td class="dynaColorTR1" nowrap="">Program</td>
+        <td class="dynaColorTR1" style="FONT-SIZE: 15px;">B.P.T. - BACHELOR OF PHYSIOTHERAPY</td></tr>
+
+</tbody></table>
+<br>
+<table id="table1" name="table1" cellpadding="5" cellspacing="2" width="100%" class="dynaColorTR2" style="background-color:#C8D3EC">
+
+
+
+
+    <tbody><tr style="BACKGROUND-COLOR:#0066cc;color:#ffffff;">
+        <td align="center">S.No.</td>
+        <td align="center">SEMESTER</td>
+        <td>Code</td>
+        <td>Course Description</td>
+        <td>CREDIT</td>
+        <td align="right" style="display:none">Theory Internal</td>
+        <td align="right" style="display:none">Theory External</td>
+        <td align="right" style="display:none">Practical Internal</td>
+        <td align="right" style="display:none">Practical External</td>
+        <td align="right" style="display:none">Vivavoce</td>
+        <td align="right" style="display:none">Internal Mark</td>
+        <td align="right" style="display:none">External Mark</td>
+        <td align="right" style="display:none">Total Score</td>
+        <td align="center">Grade</td>
+        <td align="center">Grade Point</td>
+        <td align="center">Result</td>
+    </tr>
+
+
+
+        <tr style="FONT-SIZE: 15px;">
+            <td align="center" class="dynaColorTR1">1</td>
+            <td align="center" class="dynaColorTR1">3</td>
+            <td class="dynaColorTR1">19CBPT31</td>
+            <td class="dynaColorTR1">CLINICAL MEDICINE AND PHARMACOLOGY</td>
+            <td align="center" class="dynaColorTR1">4</td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="center" class="dynaColorTR1">B</td>
+            <td align="center" null="" class="dynaColorTR1">6</td>
+            <td align="center" class="dynaColorTR1">PASS</td>
+        </tr>
+
+
+        <tr style="FONT-SIZE: 15px;">
+            <td align="center" class="dynaColorTR2">2</td>
+            <td align="center" class="dynaColorTR2">3</td>
+            <td class="dynaColorTR2">19CBPT32</td>
+            <td class="dynaColorTR2">EXERCISE THERAPY - I</td>
+            <td align="center" class="dynaColorTR2">6</td>
+            <td align="right" style="display:none" class="dynaColorTR2"></td>
+            <td align="right" style="display:none" class="dynaColorTR2"></td>
+            <td align="right" style="display:none" class="dynaColorTR2"></td>
+            <td align="right" style="display:none" class="dynaColorTR2"></td>
+            <td align="right" style="display:none" class="dynaColorTR2"></td>
+            <td align="right" style="display:none" class="dynaColorTR2"></td>
+            <td align="right" style="display:none" class="dynaColorTR2"></td>
+            <td align="right" style="display:none" class="dynaColorTR2"></td>
+            <td align="center" class="dynaColorTR2">B</td>
+            <td align="center" null="" class="dynaColorTR2">6</td>
+            <td align="center" class="dynaColorTR2">PASS</td>
+        </tr>
+
+
+        <tr style="FONT-SIZE: 15px;">
+            <td align="center" class="dynaColorTR1">3</td>
+            <td align="center" class="dynaColorTR1">3</td>
+            <td class="dynaColorTR1">19CBPT33</td>
+            <td class="dynaColorTR1">ELECTROTHERAPY - I</td>
+            <td align="center" class="dynaColorTR1">4</td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="center" class="dynaColorTR1">B</td>
+            <td align="center" null="" class="dynaColorTR1">6</td>
+            <td align="center" class="dynaColorTR1">PASS</td>
+        </tr>
+
+
+        <tr style="FONT-SIZE: 15px;">
+            <td align="center" class="dynaColorTR2">4</td>
+            <td align="center" class="dynaColorTR2">3</td>
+            <td class="dynaColorTR2">19CBPT34</td>
+            <td class="dynaColorTR2">BIOMECHANICS - I</td>
+            <td align="center" class="dynaColorTR2">4</td>
+            <td align="right" style="display:none" class="dynaColorTR2"></td>
+            <td align="right" style="display:none" class="dynaColorTR2"></td>
+            <td align="right" style="display:none" class="dynaColorTR2"></td>
+            <td align="right" style="display:none" class="dynaColorTR2"></td>
+            <td align="right" style="display:none" class="dynaColorTR2"></td>
+            <td align="right" style="display:none" class="dynaColorTR2"></td>
+            <td align="right" style="display:none" class="dynaColorTR2"></td>
+            <td align="right" style="display:none" class="dynaColorTR2"></td>
+            <td align="center" class="dynaColorTR2">B+</td>
+            <td align="center" null="" class="dynaColorTR2">7</td>
+            <td align="center" class="dynaColorTR2">PASS</td>
+        </tr>
+
+
+        <tr style="FONT-SIZE: 15px;">
+            <td align="center" class="dynaColorTR1">5</td>
+            <td align="center" class="dynaColorTR1">3</td>
+            <td class="dynaColorTR1">19GBPT31</td>
+            <td class="dynaColorTR1">CARDIOPULMONARY RESUSCITATION</td>
+            <td align="center" class="dynaColorTR1">2</td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="right" style="display:none" class="dynaColorTR1"></td>
+            <td align="center" class="dynaColorTR1">B+</td>
+            <td align="center" null="" class="dynaColorTR1">7</td>
+            <td align="center" class="dynaColorTR1">PASS</td>
+        </tr>
+
+</tbody></table>
+
+
+<table width="100%" style="font-size: 10pt;font-weight: bold;">
+    <tbody><tr class="dynaColorTR2">
+
+
+            <td>
+                O : 90-100(PASS)
+            </td>
+
+
+            <td>
+                A+ : 82-89(PASS)
+            </td>
+
+
+            <td>
+                A : 75-81(PASS)
+            </td>
+
+
+            <td>
+                B+ : 67-74(PASS)
+            </td>
+
+
+            <td>
+                B : 60-66(PASS)
+            </td>
+
+
+            <td>
+                C : 50-59(PASS)
+            </td>
+
+
+            <td>
+                D : 40-49(PASS)
+            </td>
+
+
+            <td>
+                RA : Less than 40(FAIL)
+            </td>
+
+
+            <td>
+                AA : Absent
+            </td>
+
+
+            <td>
+                MP : Malpractice
+            </td>
+            <tr>
+            <td align="center" colspan="10" class="blink"><b><font size="4"><b>Congratulations!!!</b></font></b> </td>
+        </tr>
+
+        </tr>
+
+</tbody></table>
+
+<table>
+    <tbody><tr><td class="dynaColorTR2" colspan="2"><b>Disclaimer:</b><font size="2">The Examination Results published in this WebSite is only for the immediate Information to the Examinees and does not constitute to be a Legal Document. While all efforts have been made to make the Information available on this WebSite as Authentic as possible, We are not responsible for any InAdvertent Error that may have crept in the Examination Results being published in this WebSite and for any loss to anybody or anything caused by any ShortComing, Defect or InAccuracy of the Information on this WebSite.</font> </td>
+    </tr>
+<!--     <TR><TD class='dynaColorTR1' colspan="2"><b>Note:</b>  </TD>
+    </TR>
+    <TR><TD class='dynaColorTR1' >&nbsp;</TD><TD class='dynaColorTR1'><font size="2">Last date for submitting revaluation application :-  09-01-2020.</font> </TD>
+    </TR>-->
+<!--    <TR><TD class='dynaColorTR1' >&nbsp;</TD><TD class='dynaColorTR1'><font size="2">Last Date for submitting Supplementary Examination Application form :- 20-07-2019.</font> </TD>
+    </TR>-->
+<!--    <TR><TD class='dynaColorTR1'>&nbsp;</TD><TD class='dynaColorTR1'><font size="2">2) Last date for submitting Supplementary Exam application :- 12-07-2017.</font> </TD>
+    </TR>-->
+</tbody></table>
+
+
+</div>
+                    </td>
+                </tr>
+            </tbody></table>
+            <hr>
+            <table id="table3" name="table1" cellpadding="5" cellspacing="2" width="100%">
+                <tbody><tr style="FONT-STYLE: italic;color:#396A92;FONT-FAMILY: arial;FONT-SIZE: 12px">
+                    <td align="center"><a href="../../resources/pdffiles/RevaluationNew.pdf">Download Revaluation Application</a></td>
+                </tr>
+                <tr style="FONT-STYLE: italic;color:#396A92;FONT-FAMILY: arial;FONT-SIZE: 12px">
+                    <td align="center"><a href="../../resources/pdffiles/SupplementaryNew.pdf">Download Supplementary Application</a></td>
+                </tr>
+                <tr style="FONT-STYLE: italic;color:#396A92;FONT-FAMILY: arial;FONT-SIZE: 12px">
+                    <td align="center">Powered By <b>eVarsity</b></td>
+                </tr>
+                <tr style="FONT-STYLE: normal;FONT-FAMILY: arial;color:#396A92;FONT-SIZE: 12px;">
+                    <td align="center">Developed By <a href="http://www.firstlineinfotech.com/fipl/" target="_blank" style="color: #396A92">Firstline Infotech Pvt Ltd, Chennai</a></td>
+                </tr>
+
+            </tbody></table>
+        </form>
+
+
+
+
+
+
+</body></html>
